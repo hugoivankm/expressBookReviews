@@ -19,18 +19,31 @@ public_users.get('/', function (req, res) {
 public_users.get('/isbn/:isbn', function (req, res) {
   const ISBN = req.params.isbn;
   const booksHasISBN = books.hasOwnProperty(ISBN);
-  if (ISBN && booksHasISBN ) {
+  if (ISBN && booksHasISBN) {
     return res.send(JSON.stringify(books[ISBN], null, 4));
   } else {
-    return res.status(404).send("ISBN not found")
+    return res.status(404).send("ISBN not found");
   }
 });
 
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const author = req.params.author;
+  const booksFromAuthor = {};
+  
+  function authorInBooks(author, ISBN){
+    return books[ISBN].author.toLowerCase() === author.toLowerCase();
+  }
+
+  for (const ISBN in books){
+    if(authorInBooks(author, ISBN)){
+      booksFromAuthor[ISBN] = books[ISBN]
+    }
+  }
+
+  return res.json(booksFromAuthor);
 });
+
 
 // Get all books based on title
 public_users.get('/title/:title', function (req, res) {
