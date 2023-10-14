@@ -39,6 +39,7 @@ public_users.get('/author/:author', function (req, res) {
     if(authorInBooks(author, ISBN)){
       booksFromAuthor[ISBN] = books[ISBN]
     }
+
   }
 
   return res.json(booksFromAuthor);
