@@ -12,10 +12,33 @@ const isPropertyInBooks = (property, _value, _ISBN) => {
     }
     return false;
   }
+};
+
+const doesExist = (username) => {
+  let usersWithSameName = users.filter((user) => {
+    return user.username === username;
+  });
+  if (usersWithSameName.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-public_users.post("/register", (_req, res) => {
-  
+public_users.post("/register", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (username && password) {
+    if (!doesExist(username)) {
+      users.push({ "username": username, "password": password });
+      return res.status(200).json({ message: "User successfully registered." })
+    } else {
+      return res.status(409).json({ message: "User already exists!" });
+    }
+  }
+  return res.status(400).json({ message: "Invalid user or password" });
+
 });
 
 
@@ -71,8 +94,8 @@ public_users.get('/review/:isbn', function (req, res) {
   const isbn = req.params.isbn;
   const bookReviews = {};
 
-  for(let ISBN in books){
-    if (ISBN === isbn){
+  for (let ISBN in books) {
+    if (ISBN === isbn) {
       bookReviews[ISBN] = books[isbn].reviews;
     }
   }
