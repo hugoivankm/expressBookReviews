@@ -5,9 +5,17 @@ const regd_users = express.Router();
 
 let users = [];
 
-const isValid = (username) => { //returns boolean
-  //write code to check is the username is valid
+const isValid = (username) => {
+  let usersWithSameName = users.filter((user) => {
+    return user.username === username;
+  });
+  if (usersWithSameName.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
+
 
 const authenticatedUser = (username, password) => {
   const validUsers = users.filter((user) => {
@@ -49,8 +57,14 @@ regd_users.post("/login", (req, res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const isbn = req.params.isbn;
+  const username = req.session.authorization.username;
+
+  if (isbn){
+
+  }
+
+  return res.status(202).json({message: ":D"})
 });
 
 module.exports.authenticated = regd_users;
