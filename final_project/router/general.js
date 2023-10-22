@@ -66,7 +66,6 @@ public_users.get('/author/:author', function (req, res) {
   const isAuthorOfBook = isPropertyInBooks("author");
 
   for (const ISBN in books) {
-    console.log(isAuthorOfBook(author, ISBN));
     if (isAuthorOfBook(author, ISBN)) {
       booksFromAuthor[ISBN] = books[ISBN];
     }
