@@ -5,6 +5,10 @@ const regd_users = express.Router();
 
 let users = [];
 
+const isValidISBN = (ISBN) => {
+  return books.hasOwnProperty(ISBN);
+}
+
 const isValid = (username) => {
   let usersWithSameName = users.filter((user) => {
     return user.username === username;
@@ -35,14 +39,14 @@ regd_users.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  if (!username || !password){
-    return res.status(401).json({message: "Error logging in"});
+  if (!username || !password) {
+    return res.status(401).json({ message: "Error logging in" });
   }
 
-  if(authenticatedUser(username, password)) {
+  if (authenticatedUser(username, password)) {
     const accessToken = jwt.sign({
       data: password
-    }, 'access', {expiresIn: 60 * 60});
+    }, 'access', { expiresIn: 60 * 60 });
 
     req.session.authorization = {
       accessToken,
@@ -50,22 +54,36 @@ regd_users.post("/login", (req, res) => {
     }
     return res.send("User Successfully logged in");
   } else {
-    return res.status(208).json({message: "Invalid Login. Check username or password"});
+    return res.status(208).json({ message: "Invalid Login. Check username or password" });
   }
 
 });
+
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  const isbn = req.params.isbn;
+  const ISBN = req.params.isbn;
   const username = req.session.authorization.username;
+  const newReview = req.body.review;
 
-  if (isbn){
 
+
+  if (isValidISBN(ISBN)) {
+    if (newReview) {
+      books[ISBN].reviews[username] = newReview;
+    } else {
+      return res.status(400).json({ message: "Empty review" })
+    }
+  
+  } else {
+    return res.status(404).json({ message: "ISBN not found" });
   }
 
-  return res.status(202).json({message: ":D"})
+  return res.status(202).json({ message: "Review Succussfully Added" })
 });
+
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {  });
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
