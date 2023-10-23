@@ -4,7 +4,7 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-// Predicate function to return property value comparison based on the ISBN
+// Predicate function to return property-value comparison based on the ISBN
 const isPropertyInBooks = (property, _value, _ISBN) => {
   return (value, ISBN) => {
     let contextProperty = property;
@@ -39,26 +39,32 @@ const getAllBooks = () => {
       resolve(books)
     }, simulatedDelay);
   })
-}
+};
 
 
 // Get the book list available in the shop
 public_users.get('/', async (_req, res) => {
-  let books = null;
+  let books = {};
   try {
     books = await getAllBooks();
   } catch (error) {
     console.log(error);
     return res.status(500);
-
   }
   return res.send(JSON.stringify(books, null, 4));
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn', function (req, res) {
+public_users.get('/isbn/:isbn', async (req, res) => {
   const ISBN = req.params.isbn;
   const booksHasISBN = books.hasOwnProperty(ISBN);
+  let books = {};
+  try {
+    books = await getAllBooks();
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
   if (ISBN && booksHasISBN) {
     return res.send(JSON.stringify(books[ISBN], null, 4));
   } else {
@@ -68,10 +74,18 @@ public_users.get('/isbn/:isbn', function (req, res) {
 });
 
 // Get book details based on author
-public_users.get('/author/:author', function (req, res) {
+public_users.get('/author/:author', async (req, res) => {
   const author = req.params.author;
   const booksFromAuthor = {};
   const isAuthorOfBook = isPropertyInBooks("author");
+
+  let books = {};
+  try {
+    books = await getAllBooks();
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
 
   for (const ISBN in books) {
     if (isAuthorOfBook(author, ISBN)) {
@@ -83,10 +97,18 @@ public_users.get('/author/:author', function (req, res) {
 
 
 // Get all books based on title
-public_users.get('/title/:title', function (req, res) {
+public_users.get('/title/:title', async (req, res) => {
   const title = req.params.title;
   const booksWithTitle = {};
   const isTitleOfBook = isPropertyInBooks("title");
+
+  let books = {};
+  try {
+    books = await getAllBooks();
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
 
   for (let ISBN in books) {
     if (isTitleOfBook(title, ISBN)) {
