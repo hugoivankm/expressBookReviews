@@ -4,6 +4,7 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+// Predicate function to return property value comparison based on the ISBN
 const isPropertyInBooks = (property, _value, _ISBN) => {
   return (value, ISBN) => {
     let contextProperty = property;
@@ -13,8 +14,6 @@ const isPropertyInBooks = (property, _value, _ISBN) => {
     return false;
   }
 };
-
-
 
 public_users.post("/register", (req, res) => {
   const username = req.body.username;
@@ -32,9 +31,27 @@ public_users.post("/register", (req, res) => {
 
 });
 
+// Get a Promise for all books;
+const getAllBooks = () => {
+  const simulatedDelay = 1000;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(books)
+    }, simulatedDelay);
+  })
+}
+
 
 // Get the book list available in the shop
-public_users.get('/', function (_req, res) {
+public_users.get('/', async (_req, res) => {
+  let books = null;
+  try {
+    books = await getAllBooks();
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+
+  }
   return res.send(JSON.stringify(books, null, 4));
 });
 
