@@ -57,14 +57,17 @@ public_users.get('/', async (_req, res) => {
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn', async (req, res) => {
   const ISBN = req.params.isbn;
-  const booksHasISBN = books.hasOwnProperty(ISBN);
+  let booksHasISBN = false;
   let books = {};
+
   try {
     books = await getAllBooks();
+    booksHasISBN = books.hasOwnProperty(ISBN);
   } catch (error) {
     console.log(error);
     return res.status(500);
   }
+
   if (ISBN && booksHasISBN) {
     return res.send(JSON.stringify(books[ISBN], null, 4));
   } else {
@@ -77,11 +80,12 @@ public_users.get('/isbn/:isbn', async (req, res) => {
 public_users.get('/author/:author', async (req, res) => {
   const author = req.params.author;
   const booksFromAuthor = {};
-  const isAuthorOfBook = isPropertyInBooks("author");
-
+  let isAuthorOfBook = false;
   let books = {};
+
   try {
     books = await getAllBooks();
+    isAuthorOfBook = isPropertyInBooks("author");
   } catch (error) {
     console.log(error);
     return res.status(500);
@@ -100,11 +104,12 @@ public_users.get('/author/:author', async (req, res) => {
 public_users.get('/title/:title', async (req, res) => {
   const title = req.params.title;
   const booksWithTitle = {};
-  const isTitleOfBook = isPropertyInBooks("title");
-
+  let isTitleOfBook = false;
   let books = {};
+
   try {
     books = await getAllBooks();
+    isTitleOfBook = isPropertyInBooks("title");
   } catch (error) {
     console.log(error);
     return res.status(500);
@@ -128,7 +133,7 @@ public_users.get('/review/:isbn', function (req, res) {
       bookReviews[ISBN] = books[isbn].reviews;
     }
   }
-
+  
   res.send(bookReviews);
 
 });
